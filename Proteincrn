@@ -1,0 +1,49 @@
+import pandas as pd
+from Bio import PDB
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
+# Function to extract information from a PDB file
+def extract_protein_info(pdb_file):
+    parser = PDB.PDBParser(QUIET=True)
+    structure = parser.get_structure('protein', pdb_file)
+
+    # Example: Extract information such as chain, residue, and atom coordinates
+    data = {'chain': [], 'residue': [], 'x': [], 'y': [], 'z': []}
+    for model in structure:
+        for chain in model:
+            for residue in chain:
+                for atom in residue:
+                    data['chain'].append(chain.id)
+                    data['residue'].append(residue.id[1])
+                    data['x'].append(atom.coord[0])
+                    data['y'].append(atom.coord[1])
+                    data['z'].append(atom.coord[2])
+
+    return pd.DataFrame(data)
+
+# Load a protein structure dataset (replace 'example.pdb' with your file)
+protein_df = extract_protein_info('1crn.pdb')
+
+# Display basic information about the dataset
+print("Info about the Protein Dataset:")
+print(protein_df.info())
+print("\n")
+
+# Perform some analysis on the dataset (e.g., calculate distance between atoms)
+# Add your own analysis based on the specific features of interest
+
+# Visualize the 3D structure of the protein
+fig = plt.figure(figsize=(10, 8))
+ax = fig.add_subplot(111, projection='3d')
+ax.scatter(protein_df['x'], protein_df['y'], protein_df['z'], c='blue', marker='o', alpha=0.5)
+ax.set_xlabel('X')
+ax.set_ylabel('Y')
+ax.set_zlabel('Z')
+ax.set_title('3D Structure of the Protein')
+plt.show()
+
+# Save the processed dataset to a CSV file
+protein_df.to_csv('protein_dataset_processed.csv', index=False)
+print("Processed Dataset Saved to 'protein_dataset_processed.csv'")
+
